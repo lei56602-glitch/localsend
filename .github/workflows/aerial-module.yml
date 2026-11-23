@@ -2,6 +2,16 @@ name: Aerial Flutter module
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "aerial_module/**"
+      - "app/**"
+      - "packages/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - ".github/workflows/aerial-module.yml"
   push:
     branches:
       - integration/aerial-flutter-module

@@ -1,0 +1,54 @@
+name: Aerial Flutter module
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - integration/aerial-flutter-module
+    paths:
+      - "aerial_module/**"
+      - "app/**"
+      - "packages/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - ".github/workflows/aerial-module.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-android-aar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout LocalSend
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.0"
+          channel: stable
+          cache: true
+
+      - name: Show toolchain
+        run: |
+          flutter --version
+          dart --version
+          java -version
+
+      - name: Resolve workspace dependencies
+        working-directory: aerial_module
+        run: flutter pub get
+
+      - name: Build embedded Android libraries
+        working-directory: aerial_module
+        run: flutter build aar --release
+
+      - name: Upload Flutter AAR repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: aerial-localsend-flutter-aar
+          path: aerial_module/build/host/outputs/repo/
+          if-no-files-found: error
+          retention-days: 14

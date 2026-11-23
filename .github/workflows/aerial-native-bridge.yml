@@ -27,10 +27,14 @@ jobs:
           path: aerial
           submodules: recursive
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Configure Android SDK command line tools
+        run: |
+          echo "$ANDROID_HOME/cmdline-tools/16.0/bin" >> "$GITHUB_PATH"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
       - name: Install pinned Android NDK
-        run: sdkmanager "ndk;27.2.12479018"
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --install "ndk;27.2.12479018"
 
       - name: Set up Rust 1.97.1
         uses: dtolnay/rust-toolchain@1.97.1

@@ -1,0 +1,53 @@
+name: Aerial native bridge compatibility
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/aerial-native-bridge.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  android-api21:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout LocalSend repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Aerial integration branch with pinned LocalSend submodule
+        uses: actions/checkout@v4
+        with:
+          repository: lei56602-glitch/aerial-tv
+          ref: 4e71fac4c7d570323ff96b2e0e0b9851ebc26103
+          path: aerial
+          submodules: true
+
+      - name: Use preinstalled Android NDK
+        run: |
+          test -d "$ANDROID_NDK_ROOT"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_ROOT" >> "$GITHUB_ENV"
+
+      - name: Set up Rust 1.97.1
+        uses: dtolnay/rust-toolchain@1.97.1
+        with:
+          targets: aarch64-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
+
+      - name: Build Aerial JNI bridge against LocalSend full core at API 21
+        working-directory: aerial
+        run: cargo ndk -t arm64-v8a --platform 21 build --release --manifest-path native/localsend/Cargo.toml
+
+      - name: Upload native library
+        uses: actions/upload-artifact@v4
+        with:
+          name: aerial-localsend-arm64-api21
+          path: aerial/native/localsend/target/aarch64-linux-android/release/libaerial_localsend.so
+          if-no-files-found: error
+          retention-days: 14

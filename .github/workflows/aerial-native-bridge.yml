@@ -25,7 +25,7 @@ jobs:
           repository: lei56602-glitch/aerial-tv
           ref: feature/localsend-integration
           path: aerial
-          submodules: recursive
+          submodules: true
 
       - name: Configure Android SDK command line tools
         run: |

@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lei56602-glitch/aerial-tv
-          ref: feature/localsend-integration
+          ref: 4e71fac4c7d570323ff96b2e0e0b9851ebc26103
           path: aerial
           submodules: true
 
